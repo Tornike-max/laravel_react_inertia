@@ -108,7 +108,9 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        //
+        return inertia('Project/EditForm', [
+            'project' => new ProjectResource($project)
+        ]);
     }
 
     /**
@@ -116,7 +118,6 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        //
     }
 
     /**
@@ -124,6 +125,8 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        //
+        $name = $project->name;
+        $project->delete();
+        to_route('project.index')->with('message', "Project $name Was Deleted");
     }
 }

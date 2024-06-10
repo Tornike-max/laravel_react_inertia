@@ -7,8 +7,20 @@ import { Head, Link, router } from '@inertiajs/react'
 import React from 'react'
 import TableHeading from '@/Components/TableHeading'
 import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
 
 const Index = ({ auth, projects, queryParams = null, success }) => {
+    const [message, setMessage] = useState(null)
+
+    useEffect(() => {
+        if (success) {
+            setMessage(success)
+            setTimeout(() => {
+                setMessage(null)
+            }, 3000)
+        }
+        return;
+    }, [success])
     queryParams = queryParams || {}
 
     const searchFieldChange = (name, value) => {
@@ -39,6 +51,14 @@ const Index = ({ auth, projects, queryParams = null, success }) => {
         router.get(route('project.index'), queryParams)
     }
 
+    const handleDeleteProject = (project) => {
+        // if (!window.confirm('Are you sure you want to delete this project?')) {
+        //     return;
+        // }
+
+        router.delete(route('project.destroy', project))
+    }
+
 
     return (
         <AuthenticatedLayout user={auth.user}
@@ -56,7 +76,7 @@ const Index = ({ auth, projects, queryParams = null, success }) => {
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                    {success &&
+                    {message &&
                         <motion.div variants={{
                             hidden: { opacity: 0, y: -75 },
                             visible: { opacity: 1, y: 0 },
@@ -67,7 +87,7 @@ const Index = ({ auth, projects, queryParams = null, success }) => {
                                 duration: 0.3,
                                 delay: 0.2,
                             }} className='w-full py-2 px-4 bg-emerald-500 text-gray-100 text-md font-medium mb-4 rounded-md'>
-                            {success}
+                            {message}
                         </motion.div>
                     }
                     <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
@@ -173,9 +193,9 @@ const Index = ({ auth, projects, queryParams = null, success }) => {
                                             <td className='px-3 py-2 text-nowrap'>{project.created_at}</td>
                                             <td className='px-3 py-2 text-nowrap'>{project.due_date}</td>
                                             <td className='px-3 py-2'>{project.createdBy.name}</td>
-                                            <td className='px-3 py-2'>
-                                                <Link href={route('project.edit', project.id)} className='font-medium text-blue-600 dark:text-blue-500 hover:underline mx-1'>Edit</Link>
-                                                <Link href={route('project.destroy', project.id)} className='font-medium text-red-600 dark:text-red-500 hover:underline mx-1'>Delete</Link>
+                                            <td className='px-3 py-2 text-nowrap'>
+                                                <Link href={route('project.edit', project)} className='font-medium text-blue-600 dark:text-blue-500 hover:underline mx-1'>Edit</Link>
+                                                <button onClick={(e) => handleDeleteProject(project)} className='font-medium text-red-600 dark:text-red-500 hover:underline mx-1'>Delete</button>
                                             </td>
                                         </tr>
                                     ))}
