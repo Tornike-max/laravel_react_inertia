@@ -6,7 +6,10 @@ use App\Models\Project;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
-use Inertia\Inertia;
+use App\Http\Resources\TaskResource;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class ProjectController extends Controller
 {
@@ -32,7 +35,8 @@ class ProjectController extends Controller
 
         return inertia('Project/Index', [
             'projects' => ProjectResource::collection($projects),
-            'queryParams' => request()->query() ? request()->query() : null
+            'queryParams' => request()->query() ? request()->query() : null,
+            'success' => session('message') ?? null
         ]);
     }
 
@@ -41,7 +45,7 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        //
+        return inertia('Project/CreateForm');
     }
 
     /**
@@ -49,7 +53,27 @@ class ProjectController extends Controller
      */
     public function store(StoreProjectRequest $request)
     {
-        //
+        $formFieldData = $request->validate([
+            'name' => ['required', 'min:3', 'max:30', 'string'],
+            'image' => ['image', 'nullable'],
+            'description' => ['string', 'nullable'],
+            'due_date' => ['nullable', 'date'],
+            'status' => ['required', Rule::in(['pending', 'in_progress', 'completed'])]
+        ]);
+
+
+        $image = $formFieldData['image'] ?? null;
+
+        $formFieldData['created_by'] = Auth::id();
+        $formFieldData['updated_by'] = Auth::id();
+
+
+        if ($image) {
+            $formFieldData['image_path'] = $image->store('project/' . Str::random(), 'public');
+        }
+        Project::create($formFieldData);
+
+        return to_route('project.index')->with('message', 'Project added successfully');
     }
 
     /**
@@ -57,7 +81,26 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        //
+        $query = $project->tasks();
+
+        $sortField = request('sort_field', 'created_at');
+        $sortDirection = request('sort_direction', 'desc');
+
+        if (request('name')) {
+            $query->where('name', 'like', '%' . request('name') . '%');
+        }
+
+        if (request('status')) {
+            $query->where('status', request('status'));
+        }
+
+        $tasks = $query->orderBy($sortField, $sortDirection)->paginate(10);
+
+        return inertia('Project/Show', [
+            'project' => new ProjectResource($project),
+            'tasks' => TaskResource::collection($tasks),
+            'queryParams' => request()->query() ?: null,
+        ]);
     }
 
     /**
