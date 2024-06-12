@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\TaskResource;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 
@@ -118,6 +119,29 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
+        $formFieldData = $request->validate([
+            'name' => ['required', 'min:3', 'max:30', 'string'],
+            'image' => ['image', 'nullable'],
+            'description' => ['string', 'nullable'],
+            'due_date' => ['nullable', 'date'],
+            'status' => ['required', Rule::in(['pending', 'in_progress', 'completed'])]
+        ]);
+
+        $image = $formFieldData['image'] ?? null;
+        $formFieldData['created_by'] = Auth::id();
+        $formFieldData['updated_by'] = Auth::id();
+
+        if ($project->image_path) {
+            Storage::disk('public')->deleteDirectory(dirname($project->image_path));
+        }
+
+        if ($image) {
+            $formFieldData['image_path'] = $image->store('project/' . Str::random(), 'public');
+        }
+
+        $project->update($formFieldData);
+
+        return to_route('project.index')->with('message', 'Project Updated Successfully');
     }
 
     /**
@@ -127,6 +151,9 @@ class ProjectController extends Controller
     {
         $name = $project->name;
         $project->delete();
+        if ($project->image_path) {
+            Storage::disk('public')->deleteDirectory(dirname($project->image_path));
+        }
         to_route('project.index')->with('message', "Project $name Was Deleted");
     }
 }

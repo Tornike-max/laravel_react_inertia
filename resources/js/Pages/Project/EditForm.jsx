@@ -16,11 +16,11 @@ const EditForm = ({ auth, project }) => {
         due_date: '',
         _method: 'PUT'
     })
-    console.log(project)
 
     const onSubmit = () => {
-        post(route('project.update', []))
+        post(route('project.update', project.id))
     }
+
     return (
         <AuthenticatedLayout user={auth.user}
             header={
@@ -39,6 +39,9 @@ const EditForm = ({ auth, project }) => {
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                     <div className='bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg'>
                         <form onSubmit={onSubmit} className="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+                            <div className='mt-4'>
+                                <img src={project.image_path} alt='image' className='w-full object-cover' />
+                            </div>
                             <div>
                                 <InputLabel htmlFor='project_image_path' value='Project Image' />
                                 <TextInput
@@ -57,7 +60,7 @@ const EditForm = ({ auth, project }) => {
                                     id='project_name'
                                     type='text'
                                     name='name'
-                                    value={data.name}
+                                    value={project.name}
                                     isFocused={true}
                                     className='mt-1 block w-full'
                                     onChange={e => setData('name', e.target.value)}
@@ -69,7 +72,7 @@ const EditForm = ({ auth, project }) => {
                                 <TextAreaInput
                                     id='project_description'
                                     name='name'
-                                    value={data.description}
+                                    value={project.description}
                                     className='mt-1 block w-full'
                                     onChange={e => setData('description', e.target.value)}
                                 />
@@ -81,7 +84,7 @@ const EditForm = ({ auth, project }) => {
                                     id='due_date'
                                     type='date'
                                     name='due_date'
-                                    value={data.due_date}
+                                    value={project.due_date}
                                     isFocused={true}
                                     className='mt-1 block w-full'
                                     onChange={e => setData('due_date', e.target.value)}
@@ -90,7 +93,7 @@ const EditForm = ({ auth, project }) => {
                             </div>
                             <div className='mt-4'>
                                 <SelectInput
-                                    defaultValue={data.status}
+                                    defaultValue={project.status}
                                     className='w-full'
                                     onChange={(e) => setData('status', e.target.value)}
                                 >
@@ -104,7 +107,7 @@ const EditForm = ({ auth, project }) => {
                             </div>
                             <div className='mt-4 text-right space-x-4'>
                                 <Link href={route('project.index')} className='bg-red-500 hover:bg-red-600 py-2 px-3 text-white rounded shadow transition-all duration-150'>Cancel</Link>
-                                <button type='submit' className='bg-emerald-500 hover:bg-emerald-600 py-2 px-3 text-white rounded shadow transition-all duration-150'>Add</button>
+                                <button type='submit' className='bg-emerald-500 hover:bg-emerald-600 py-2 px-3 text-white rounded shadow transition-all duration-150'>Update</button>
                             </div>
                         </form>
                     </div>
