@@ -3,13 +3,20 @@ import SelectInput from '@/Components/SelectInput'
 import TableHeading from '@/Components/TableHeading'
 import TextInput from '@/Components/TextInput'
 import { TASK_STATUS_CLASS_MAP, TASK_STATUS_TEXT_MAP } from '@/constants'
-import { Link } from '@inertiajs/react'
+import { Link, router } from '@inertiajs/react'
 import React from 'react'
 
-const TasksTable = ({ tasks, queryParams = null, sortChanged, searchFieldChange, hideProjectColumn = false }) => {
+const TasksTable = ({ tasks, queryParams = null, sortChanged, searchFieldChange, hideTaskColumn = false }) => {
     queryParams = queryParams || {}
 
-    console.log(tasks)
+
+    const handleDeleteTask = (task) => {
+        // if (!window.confirm('Are you sure you want to delete this project?')) {
+        //     return;
+        // }
+
+        router.delete(route('task.destroy', task))
+    }
     return (
         <>
             <div className='overflow-x-auto'>
@@ -26,15 +33,15 @@ const TasksTable = ({ tasks, queryParams = null, sortChanged, searchFieldChange,
                             <th>
                                 Image
                             </th>
-                            {!hideProjectColumn && <th>
-                                Project Name
+                            {!hideTaskColumn && <th>
+                                Task Name
                             </th>}
                             <TableHeading name={'name'}
                                 sort_field={queryParams.sort_field}
                                 sort_direction={queryParams.sort_direction}
                                 sortChanged={sortChanged}
                             >
-                                Name
+                                Priject Name
                             </TableHeading>
                             <TableHeading name={'status'}
                                 sort_field={queryParams.sort_field}
@@ -69,7 +76,7 @@ const TasksTable = ({ tasks, queryParams = null, sortChanged, searchFieldChange,
                         <tr className='text-nowrap'>
                             <th className='px-3 py-3'></th>
                             <th className='px-3 py-3'></th>
-                            {!hideProjectColumn && <th className='px-3 py-3'></th>}
+                            {!hideTaskColumn && <th className='px-3 py-3'></th>}
                             <th className='px-3 py-3'>
                                 <TextInput
                                     className='w-full'
@@ -105,7 +112,7 @@ const TasksTable = ({ tasks, queryParams = null, sortChanged, searchFieldChange,
                                 <td className='px-3 py-2'>
                                     <img src={task.image_path} alt='image' style={{ maxWidth: '60px', width: '100%' }} />
                                 </td>
-                                {!hideProjectColumn && <td className='px-3 py-2'>{task.project.name}</td>}
+                                {!hideTaskColumn && <td className='px-3 py-2'>{task.project.name}</td>}
                                 <td className='px-3 py-2'>{task.name}</td>
                                 <td className='px-3 py-2'>
                                     <span className={`px-2 py-1 rounded text-white ${TASK_STATUS_CLASS_MAP[task.status]}`}>
@@ -117,7 +124,7 @@ const TasksTable = ({ tasks, queryParams = null, sortChanged, searchFieldChange,
                                 <td className='px-3 py-2'>{task.createdBy.name}</td>
                                 <td className='px-3 py-2'>
                                     <Link href={route('task.edit', task.id)} className='font-medium text-blue-600 dark:text-blue-500 hover:underline mx-1'>Edit</Link>
-                                    <Link href={route('task.destroy', task.id)} className='font-medium text-red-600 dark:text-red-500 hover:underline mx-1'>Delete</Link>
+                                    <button onClick={() => handleDeleteTask(task)} className='font-medium text-red-600 dark:text-red-500 hover:underline mx-1'>Delete</button>
                                 </td>
                             </tr>
                         ))}
