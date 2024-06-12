@@ -129,17 +129,17 @@ class TaskController extends Controller
         $formFieldData['created_by'] = Auth::id();
         $formFieldData['updated_by'] = Auth::id();
 
-        if ($task->image_path) {
-            Storage::disk('public')->deleteDirectory(dirname($task->image_path));
-        }
-
         $image = $formFieldData['image'] ?? null;
 
         if ($image) {
+            if ($task->image_path) {
+                Storage::disk('public')->deleteDirectory(dirname($task->image_path));
+            }
             $formFieldData['image_path'] = $image->store('task/' . Str::random(), 'public');
         } else {
             unset($formFieldData['image']);
         }
+
 
         $task->update($formFieldData);
 

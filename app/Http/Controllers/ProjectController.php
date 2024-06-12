@@ -56,7 +56,7 @@ class ProjectController extends Controller
     {
         $formFieldData = $request->validate([
             'name' => ['required', 'min:3', 'max:30', 'string'],
-            'image' => ['image', 'nullable'],
+            'image' => ['nullable', 'image'],
             'description' => ['string', 'nullable'],
             'due_date' => ['nullable', 'date'],
             'status' => ['required', Rule::in(['pending', 'in_progress', 'completed'])]
@@ -119,25 +119,22 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        $formFieldData = $request->validate([
-            'name' => ['required', 'min:3', 'max:30', 'string'],
-            'image' => ['image', 'nullable'],
-            'description' => ['string', 'nullable'],
-            'due_date' => ['nullable', 'date'],
-            'status' => ['required', Rule::in(['pending', 'in_progress', 'completed'])]
-        ]);
+        $formFieldData = $request->validated();
 
-        $image = $formFieldData['image'] ?? null;
         $formFieldData['created_by'] = Auth::id();
         $formFieldData['updated_by'] = Auth::id();
 
-        if ($project->image_path) {
-            Storage::disk('public')->deleteDirectory(dirname($project->image_path));
-        }
+        $image = $formFieldData['image'] ?? null;
 
         if ($image) {
+            if ($project->image_path) {
+                Storage::disk('public')->deleteDirectory(dirname($project->image_path));
+            }
             $formFieldData['image_path'] = $image->store('project/' . Str::random(), 'public');
+        } else {
+            unset($formFieldData['image']);
         }
+
 
         $project->update($formFieldData);
 

@@ -9,15 +9,17 @@ import React from 'react'
 
 const EditForm = ({ auth, project }) => {
     const { data, setData, post, errors, reset } = useForm({
-        image: project.image_path || '',
+        image: '',
         name: project.name || '',
         status: project.status || '',
         description: project.description || '',
         due_date: project.due_date || '',
+
         _method: 'PUT'
     })
 
-    const onSubmit = () => {
+    const onSubmit = (e) => {
+        e.preventDefault();
         post(route('project.update', project.id))
     }
 
@@ -52,7 +54,6 @@ const EditForm = ({ auth, project }) => {
                                     onChange={e => setData('image', e.target.files[0])}
                                 />
                                 <InputError message={errors.image} className='mt-2' />
-
                             </div>
                             <div className='mt-4'>
                                 <InputLabel htmlFor='project_name' value='Project Name' />
