@@ -33,9 +33,6 @@ const TasksTable = ({ tasks, queryParams = null, sortChanged, searchFieldChange,
                             <th>
                                 Image
                             </th>
-                            {!hideTaskColumn && <th>
-                                Task Name
-                            </th>}
                             <TableHeading name={'name'}
                                 sort_field={queryParams.sort_field}
                                 sort_direction={queryParams.sort_direction}
@@ -43,6 +40,9 @@ const TasksTable = ({ tasks, queryParams = null, sortChanged, searchFieldChange,
                             >
                                 Priject Name
                             </TableHeading>
+                            {!hideTaskColumn && <th>
+                                Task Name
+                            </th>}
                             <TableHeading name={'status'}
                                 sort_field={queryParams.sort_field}
                                 sort_direction={queryParams.sort_direction}
@@ -113,7 +113,9 @@ const TasksTable = ({ tasks, queryParams = null, sortChanged, searchFieldChange,
                                     <img src={task.image_path} alt='image' style={{ maxWidth: '60px', width: '100%' }} />
                                 </td>
                                 {!hideTaskColumn && <td className='px-3 py-2'>{task.project.name}</td>}
-                                <td className='px-3 py-2'>{task.name}</td>
+                                <td className='px-3 py-2'>
+                                    <Link className='hover:underline' href={route('task.show', task)}>{task.name}</Link>
+                                </td>
                                 <td className='px-3 py-2'>
                                     <span className={`px-2 py-1 rounded text-white ${TASK_STATUS_CLASS_MAP[task.status]}`}>
                                         {TASK_STATUS_TEXT_MAP[task.status]}

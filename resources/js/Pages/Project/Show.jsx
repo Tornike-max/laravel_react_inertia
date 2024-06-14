@@ -79,6 +79,7 @@ const Show = ({ auth, project, tasks, queryParams }) => {
                             <TasksTable
                                 tasks={tasks}
                                 queryParams={queryParams}
+                                hideTaskColumn={true}
                             />
                         </div>
                     </div>

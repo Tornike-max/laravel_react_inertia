@@ -57,7 +57,6 @@ const Index = ({ auth, tasks, queryParams = null }) => {
                                 queryParams={queryParams}
                                 sortChanged={sortChanged}
                                 searchFieldChange={searchFieldChange}
-                                hideTaskColumn={true}
                             />
                         </div>
                     </div>

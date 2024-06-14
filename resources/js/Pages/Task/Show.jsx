@@ -1,12 +1,12 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
-import { TASK_STATUS_CLASS_MAP, TASK_STATUS_TEXT_MAP } from '@/constants'
-import { Head } from '@inertiajs/react'
+import { TASK_PRIORITY_CLASS_MAP, TASK_PRIORITY_TEXT_MAP, TASK_STATUS_CLASS_MAP, TASK_STATUS_TEXT_MAP } from '@/constants'
+import { Head, Link } from '@inertiajs/react'
 import React from 'react'
 import TasksTable from '../Task/TasksTable'
 
-const Show = ({ auth, task, tasks, queryParams }) => {
+const Show = ({ auth, task }) => {
 
-    console.log(tasks)
+    console.log(task)
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -36,6 +36,14 @@ const Show = ({ auth, task, tasks, queryParams }) => {
                                         <p className='mt-1'>{task.name}</p>
                                     </div>
                                     <div className='mt-4'>
+                                        <label className='font-bold text-lg'>Priority</label>
+                                        <p className='mt-1'>
+                                            <span className={`px-2 py-1 rounded text-white ${TASK_PRIORITY_CLASS_MAP[task.priority]}`}>
+                                                {TASK_PRIORITY_TEXT_MAP[task.priority]}
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div className='mt-4'>
                                         <label className='font-bold text-lg'>Status</label>
                                         <p className='mt-1'>
                                             <span className={`px-2 py-1 rounded text-white ${TASK_STATUS_CLASS_MAP[task.status]}`}>
@@ -61,6 +69,14 @@ const Show = ({ auth, task, tasks, queryParams }) => {
                                         <label className='font-bold text-lg'>Updated By</label>
                                         <p className='mt-1'>{task.updatedBy.name}</p>
                                     </div>
+                                    <div className='mt-4'>
+                                        <label className='font-bold text-lg'>Project Name</label>
+                                        <p className='mt-1'>
+                                            <Link className='hover:underline' href={route('project.show', task.project.id)}>
+                                                {task.project.name}
+                                            </Link>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                             <div className='w-full mt-4 text-gray-900 dark:text-gray-100'>
@@ -71,20 +87,6 @@ const Show = ({ auth, task, tasks, queryParams }) => {
                     </div>
                 </div>
             </div>
-
-            <div className="pb-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900 dark:text-gray-100">
-                            <TasksTable
-                                tasks={tasks}
-                                queryParams={queryParams}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
 
         </AuthenticatedLayout >
     )

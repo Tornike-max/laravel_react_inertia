@@ -12,7 +12,6 @@ use App\Models\Project;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 
 
@@ -39,6 +38,30 @@ class TaskController extends Controller
         return inertia('Task/Index', [
             'tasks' => TaskResource::collection($tasks),
             'queryParams' => request()->query() ? request()->query() : null
+        ]);
+    }
+
+    public function myTasks()
+    {
+        $user = auth()->user();
+        $query = Task::query()->where('assigned_user_id', $user->id);
+
+        $sortField = request('sort_field', 'created_at');
+        $sortDirection = request('sort_direction', 'desc');
+
+
+        if (request('name')) {
+            $query->where('name', 'like', "%" . request('name') . '%');
+        }
+        if (request('status')) {
+            $query->where('status', request('status'));
+        }
+
+        $tasks = $query->orderBy($sortField, $sortDirection)->paginate(10);
+
+        return inertia('Task/Index', [
+            'tasks' => TaskResource::collection($tasks),
+            'queryParams' => request()->query() ? request()->query() : null,
         ]);
     }
 
@@ -83,24 +106,8 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        $query = $task->tasks();
-
-        $sortField = request('sort_field', 'created_at');
-        $sortDirection = request('sort_direction', 'desc');
-
-        if (request('name')) {
-            $query->where('name', 'like', '%' . request('name') . '%');
-        }
-
-        if (request('status')) {
-            $query->where('status', request('status'));
-        }
-
-        $tasks = $query->orderBy($sortField, $sortDirection)->paginate(10);
-
-        return inertia('Project/Show', [
-            'project' => new TaskResource($task),
-            'queryParams' => request()->query() ?: null,
+        return inertia('Task/Show', [
+            'task' => new TaskResource($task),
         ]);
     }
 
